@@ -1,0 +1,7 @@
+name = "ImportanceSampling"
+uuid = "4f2d446e-6089-4924-a007-48554a167aee"
+authors = ["Šimon Soldát"]
+version = "0.1.0"
+
+[compat]
+julia = "1.11"
