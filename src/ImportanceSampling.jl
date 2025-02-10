@@ -9,6 +9,8 @@ export NormalProposal
 export OptimizationFitter
 export AMIS
 
+export resample
+
 using Distributions
 using LinearAlgebra
 using Optimization
@@ -18,5 +20,6 @@ include("options.jl")
 include("proposal_distributions/include.jl")
 include("distribution_fitters/include.jl")
 include("sampling_methods/include.jl")
+include("resample.jl")
 
 end # module ImportanceSampling

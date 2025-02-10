@@ -12,8 +12,8 @@ end
 
 function example()
     amis = AMIS(;
-        T = 100,
-        N = 20,
+        T = 10,
+        N = 100,
     )
 
     q = NormalProposal([0.,0.], [1.,1.])
@@ -32,13 +32,17 @@ function example()
 
     xs, ws = amis(target_pdf, q, fitter; options)
 
-    plot_samples(xs, ws) |> display
+    plot_samples(xs, ws; title="Weighted Samples") |> display
+
+    xs_ = resample(xs, ws, 200)
+    plot_samples(xs_, ones(200); title="Un-weighted Samples") |> display
+
     return xs, ws
 end
 
-function plot_samples(xs, ws)
+function plot_samples(xs, ws; title=nothing)
     fig = Figure()
-    ax = Axis(fig[1, 1])
+    ax = Axis(fig[1, 1]; title)
 
     contourf!(ax, -5:0.1:5, -5:0.1:5, (x1, x2) -> target_pdf([x1, x2]))
     scatter!(ax, xs[1, :], xs[2, :], color = ws, colormap = :solar)
