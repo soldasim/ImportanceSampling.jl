@@ -18,12 +18,13 @@ function example()
 
     q = NormalProposal([0.,0.], [1.,1.])
 
-    fitter = OptimizationFitter(;
-        algorithm = NEWUOA(),
-        multistart = 20,
-        parallel = true,
-        rhoend = 1e-4,
-    )
+    # fitter = OptimizationFitter(;
+    #     algorithm = NEWUOA(),
+    #     multistart = 20,
+    #     parallel = true,
+    #     rhoend = 1e-2,
+    # )
+    fitter = AnalyticalFitter()
 
     options = ISOptions(;
         info = true,
@@ -31,7 +32,6 @@ function example()
     )
 
     xs, ws = amis(target_pdf, q, fitter; options)
-
     plot_samples(xs, ws; title="Weighted Samples") |> display
 
     xs_ = resample(xs, ws, 200)

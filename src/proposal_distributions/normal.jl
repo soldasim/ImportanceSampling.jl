@@ -73,3 +73,21 @@ function set_params!(dist::NormalProposal, θ::AbstractVector{<:Real})
     μ, Σ = decode_params(dist, θ)
     dist.dist = MvNormal(μ, Σ)
 end
+
+function estimate_parameters!(dist::NormalProposal, xs::AbstractMatrix{<:Real}, ws::AbstractVector{<:Real})
+    # An unbiased estimator for "reliability" weights
+    
+    V1 = sum(ws)
+    V2 = sum(ws .^ 2)
+
+    # μ = sum(ws .* eachcol(xs)) ./ V1
+    μ = mapreduce(t -> *(t...), +, zip(ws, eachcol(xs))) ./ V1
+    
+    δs = xs .- μ
+    C(δ) = δ * δ'
+
+    # Σ = sum(ws .* C.(eachcol(δs))) ./ (V1 - (V2 / V1))
+    Σ = mapreduce(t -> t[1] * C(t[2]), +, zip(ws, eachcol(δs))) ./ (V1 - (V2 / V1))
+
+    dist.dist = MvNormal(μ, Σ)
+end

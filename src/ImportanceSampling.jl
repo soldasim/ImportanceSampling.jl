@@ -6,7 +6,7 @@ export SamplingMethod
 export ISOptions
 
 export NormalProposal
-export OptimizationFitter
+export AnalyticalFitter, OptimizationFitter
 export AMIS
 
 export resample

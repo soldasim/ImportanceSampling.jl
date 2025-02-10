@@ -17,7 +17,7 @@ of the `ProposalDistribution` API, so that the `DistributionFitter` can work wit
 abstract type ProposalDistribution end
 
 
-# API
+# --- --- Mandatory API --- ---
 
 """
 Return some initial parameter values for the likelihood maximization.
@@ -45,6 +45,18 @@ function loglikelihood(::ProposalDistribution, xs::AbstractMatrix{<:Real}, ws::A
 Set the parameters of the given `ProposalDistribution` to the given values `θ`.
 """
 function set_params!(::ProposalDistribution, θ::AbstractVector{<:Real}) end
+
+
+# --- --- Optional API --- ---
+
+"""
+Analytically compute the optimal estimate of the distribution parameters
+according to the given data `xs`.
+
+This function is a part of the _optional_ API of the `ProposalDistribution`
+and may not be implemented for every distribution.
+"""
+function estimate_parameters!(::ProposalDistribution, xs::AbstractMatrix{<:Real}, ws::AbstractVector{<:Real}) end
 
 
 # Default implementations
