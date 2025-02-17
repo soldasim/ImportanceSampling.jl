@@ -3,11 +3,11 @@ using Distributions
 using OptimizationPRIMA
 using CairoMakie
 
-function target_pdf(x)
+function target_logpdf(x)
     y = x[1] * x[2]
     ll = logpdf(Normal(1., 0.5), y)
     logp = logpdf(MvNormal(zeros(2), ones(2)), x)
-    return exp(ll + logp)
+    return ll + logp
 end
 
 function example()
@@ -31,7 +31,7 @@ function example()
         debug = false,
     )
 
-    xs, ws = amis(target_pdf, q, fitter; options)
+    xs, ws = amis(target_logpdf, q, fitter; options)
     plot_samples(xs, ws; title="Weighted Samples") |> display
 
     xs_ = resample(xs, ws, 200)
@@ -44,7 +44,7 @@ function plot_samples(xs, ws; title=nothing)
     fig = Figure()
     ax = Axis(fig[1, 1]; title)
 
-    contourf!(ax, -5:0.1:5, -5:0.1:5, (x1, x2) -> target_pdf([x1, x2]))
+    contourf!(ax, -5:0.1:5, -5:0.1:5, (x1, x2) -> exp(target_logpdf([x1, x2])))
     scatter!(ax, xs[1, :], xs[2, :], color = ws, colormap = :solar)
 
     return fig
