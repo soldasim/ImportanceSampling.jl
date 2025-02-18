@@ -63,7 +63,7 @@ function (amis::AMIS)(log_π, q::ProposalDistribution, fitter::DistributionFitte
     # TODO
     xs_ = collect_samples(xs, 1:T+1)
     ws_ = collect_weights(log_Ω, 1:T+1) |> exp_weights
-    return xs_, ws_
+    return xs_, ws_, qs
 
     # xs_ = collect_samples(xs, 2:T+1)
     # ws_ = collect_weights(log_Ω, 2:T+1) |> exp_weights
