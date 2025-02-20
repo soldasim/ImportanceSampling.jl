@@ -1,6 +1,7 @@
 
 """
-    AMIS(; kwargs...)
+    amis = AMIS(; kwargs...)
+    xs, ws = amis(log_π, proposal, fitter; kwargs...)
 
 Performs the AMIS (adaptive multiple importance sampling) algorithm.
 Returns `(T * N)` importance samples with weights.
@@ -9,23 +10,37 @@ Returns `(T * N)` importance samples with weights.
 
 - `T::Int64`: Number of iterations.
 - `N::Int64`: Number of samples in each iteration.
+- `init_q::Union{Nothing, <:MultivariateDistribution}`: Initial proposal distribution
+        used only for the 0th iteration. If `init_q = nothing`, then the provided
+        `ProposalDistribution` (with the current parameters) is used for the 0th iteration instead.
+        Defaults to `nothing`.
 """
-@kwdef struct AMIS <: SamplingMethod
+@kwdef struct AMIS{
+    Q<:Union{Nothing, <:MultivariateDistribution}
+} <: SamplingMethod
     T::Int64 = 10
     N::Int64 = 20
+    init_q::Q = nothing
 end
 
 function (amis::AMIS)(log_π, q::ProposalDistribution, fitter::DistributionFitter;
-    options::ISOptions = ISOptions(),    
+    options::ISOptions = ISOptions(),
 )
     x_dim_ = x_dim(q)
     N, T = amis.N, amis.T
 
-    qs = [deepcopy(q) for _ in 1:T+1]
+    if isnothing(amis.init_q)
+        qs = [deepcopy(q) for _ in 1:T+1]
+    else
+        qs = vcat(amis.init_q, [deepcopy(q) for _ in 1:T])
+    end
+    
     xs = zeros(x_dim_, N, T+1)
     log_P = zeros(N, T+1)
     Δ = zeros(N, T+1)
     log_Ω = zeros(N, T+1)
+
+    options.info && (prog = Progress(T+1; desc="AMIS: "))
 
     # t = 0
     xs[:, :, 1] = rand(qs[1], N)
@@ -34,7 +49,7 @@ function (amis::AMIS)(log_π, q::ProposalDistribution, fitter::DistributionFitte
     Δ[:, 1] .= pdf.(Ref(qs[1]), eachcol(xs[:, :, 1]))
     log_Ω[:, 1] .= log_P[:, 1] .- log.(Δ[:, 1])
 
-    options.info && (prog = Progress(T; desc="AMIS: "))
+    options.info && next!(prog)
 
     # t = 1,...,T
     for t in 2:T+1
