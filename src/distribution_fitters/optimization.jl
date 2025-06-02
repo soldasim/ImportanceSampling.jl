@@ -3,6 +3,7 @@ struct OptimizationFitter{A} <: DistributionFitter
     algorithm::A
     multistart::Int64
     parallel::Bool
+    static_schedule::Bool
     autodiff::Optimization.AbstractADType
     kwargs::Base.Pairs{Symbol, <:Any}
 end
@@ -10,6 +11,7 @@ function OptimizationFitter(;
     algorithm,
     multistart = 200,
     parallel = true,
+    static_schedule = false,
     autodiff = AutoForwardDiff(),
     kwargs...
 )
@@ -17,6 +19,7 @@ function OptimizationFitter(;
         algorithm,
         multistart,
         parallel,
+        static_schedule,
         autodiff,
         kwargs,
     )
@@ -39,6 +42,7 @@ function fit_distribution!(opt::OptimizationFitter, dist::ProposalDistribution, 
 
     θ_opt, _ = optimize_multistart(optimize, init_θs;
         opt.parallel,
+        opt.static_schedule,
         options,
     )
     set_params!(dist, θ_opt)

@@ -22,6 +22,7 @@ function example()
     #     algorithm = NEWUOA(),
     #     multistart = 20,
     #     parallel = true,
+    #     static_schedule = true,
     #     rhoend = 1e-2,
     # )
     fitter = AnalyticalFitter()
